@@ -2,11 +2,12 @@ import { useState } from 'react';
 import NoTodos from './NoTodos';
 import TodoForm from './TodoForm';
 import TodoList from './TodoList';
+import { Todo } from '../Interfaces';
 import '../reset.css';
 import '../App.css';
 
-function App() {
-  const [todos, setTodos] = useState([
+function App(): JSX.Element {
+  const [todos, setTodos] = useState<Todo[]>([
     {
       id: 1,
       title: 'Finish React Series',
@@ -27,28 +28,28 @@ function App() {
     },
   ]);
 
-  const [idForTodo, setIdForTodo] = useState(4);
+  const [idForTodo, setIdForTodo] = useState<number>(4);
 
-  function addTodo(todo) {
+  function addTodo(todoTitle: string): void {
     setTodos([
       ...todos,
       {
         id: idForTodo,
-        title: todo,
+        title: todoTitle,
         isComplete: false,
         isEditing: false,
       },
     ]);
 
-    setIdForTodo(prevIdForTodo => prevIdForTodo + 1);
+    setIdForTodo((prevIdForTodo: number) => prevIdForTodo + 1);
   }
 
-  function deleteTodo(id) {
-    setTodos([...todos].filter(todo => todo.id !== id));
+  function deleteTodo(id: number): void {
+    setTodos([...todos].filter((todo: Todo) => todo.id !== id));
   }
 
-  function completeTodo(id) {
-    const updatedTodos = todos.map(todo => {
+  function completeTodo(id: number): void {
+    const updatedTodos: Todo[] = todos.map((todo: Todo) => {
       if (todo.id === id) {
         todo.isComplete = !todo.isComplete;
       }
@@ -59,8 +60,8 @@ function App() {
     setTodos(updatedTodos);
   }
 
-  function markAsEditing(id) {
-    const updatedTodos = todos.map(todo => {
+  function markAsEditing(id: number): void {
+    const updatedTodos: Todo[] = todos.map((todo: Todo) => {
       if (todo.id === id) {
         todo.isEditing = true;
       }
@@ -71,8 +72,13 @@ function App() {
     setTodos(updatedTodos);
   }
 
-  function updateTodo(event, id) {
-    const updatedTodos = todos.map(todo => {
+  function updateTodo(
+    event:
+      | React.FocusEvent<HTMLInputElement, Element>
+      | React.KeyboardEvent<HTMLInputElement>,
+    id: number
+  ): void {
+    const updatedTodos: Todo[] = todos.map((todo: Todo) => {
       if (todo.id === id) {
         if (event.currentTarget.value.trim().length === 0) {
           todo.isEditing = false;
@@ -88,8 +94,11 @@ function App() {
     setTodos(updatedTodos);
   }
 
-  function cancelEdit(event, id) {
-    const updatedTodos = todos.map(todo => {
+  function cancelEdit(
+    event: React.KeyboardEvent<HTMLInputElement>,
+    id: number
+  ): void {
+    const updatedTodos: Todo[] = todos.map((todo: Todo) => {
       if (todo.id === id) {
         todo.isEditing = false;
       }
@@ -100,8 +109,8 @@ function App() {
     setTodos(updatedTodos);
   }
 
-  function completeAllTodos() {
-    const updatedTodos = todos.map(todo => {
+  function completeAllTodos(): void {
+    const updatedTodos: Todo[] = todos.map((todo: Todo) => {
       todo.isComplete = true;
 
       return todo;
@@ -110,8 +119,8 @@ function App() {
     setTodos(updatedTodos);
   }
 
-  function remaining() {
-    return todos.filter(todo => !todo.isComplete).length;
+  function remaining(): number {
+    return todos.filter((todo: Todo) => !todo.isComplete).length;
   }
 
   return (

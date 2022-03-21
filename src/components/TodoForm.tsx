@@ -1,25 +1,24 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 
-TodoForm.propTypes = {
-  addTodo: PropTypes.func.isRequired,
-};
+interface Props {
+  addTodo: (todoTitle: string) => void;
+}
 
-function TodoForm(props) {
+function TodoForm({ addTodo }: Props): JSX.Element {
   const [todoInput, setTodoInput] = useState('');
 
-  function handleInput(event) {
+  function handleInput(event: React.ChangeEvent<HTMLInputElement>): void {
     setTodoInput(event.target.value);
   }
 
-  function handleSubmit(event) {
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
     event.preventDefault();
 
     if (todoInput.trim().length === 0) {
       return;
     }
 
-    props.addTodo(todoInput);
+    addTodo(todoInput);
 
     setTodoInput('');
   }

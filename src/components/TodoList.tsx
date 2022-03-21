@@ -1,60 +1,84 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { Todo } from '../Interfaces';
 
-TodoList.propTypes = {
-  todos: PropTypes.array.isRequired,
-  completeTodo: PropTypes.func.isRequired,
-  markAsEditing: PropTypes.func.isRequired,
-  updateTodo: PropTypes.func.isRequired,
-  cancelEdit: PropTypes.func.isRequired,
-  deleteTodo: PropTypes.func.isRequired,
-  remaining: PropTypes.func.isRequired,
-  completeAllTodos: PropTypes.func.isRequired,
-};
+interface Props {
+  todos: Todo[];
+  completeTodo: (id: number) => void;
+  markAsEditing: (id: number) => void;
+  updateTodo: (
+    event:
+      | React.FocusEvent<HTMLInputElement, Element>
+      | React.KeyboardEvent<HTMLInputElement>,
+    id: number
+  ) => void;
+  cancelEdit: (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    id: number
+  ) => void;
+  deleteTodo: (id: number) => void;
+  remaining: () => number;
+  completeAllTodos: () => void;
+}
 
-function TodoList(props) {
+function TodoList(props: Props): JSX.Element {
+  const {
+    todos,
+    completeTodo,
+    markAsEditing,
+    updateTodo,
+    cancelEdit,
+    deleteTodo,
+    remaining,
+    completeAllTodos,
+  } = props;
+
+  function renderTodoNotEditing(todo: Todo): JSX.Element {
+    return (
+      <span
+        onDoubleClick={() => markAsEditing(todo.id)}
+        className={`todo-item-label ${todo.isComplete ? 'line-through' : ''}`}
+      >
+        {todo.title}
+      </span>
+    );
+  }
+
+  function renderTodoEditing(todo: Todo): JSX.Element {
+    return (
+      <input
+        type="text"
+        onBlur={event => updateTodo(event, todo.id)}
+        onKeyDown={event => {
+          if (event.key === 'Enter') {
+            updateTodo(event, todo.id);
+          } else if (event.key === 'Escape') {
+            cancelEdit(event, todo.id);
+          }
+        }}
+        className="todo-item-input"
+        defaultValue={todo.title}
+        autoFocus
+      />
+    );
+  }
+
   return (
     <>
       <ul className="todo-list">
-        {props.todos.map((todo, index) => (
+        {todos.map((todo, index) => (
           <li key={todo.id} className="todo-item-container">
             <div className="todo-item">
               <input
                 type="checkbox"
-                onChange={() => props.completeTodo(todo.id)}
+                onChange={() => completeTodo(todo.id)}
                 checked={todo.isComplete ? true : false}
               />
 
-              {!todo.isEditing ? (
-                <span
-                  onDoubleClick={() => props.markAsEditing(todo.id)}
-                  className={`todo-item-label ${
-                    todo.isComplete ? 'line-through' : ''
-                  }`}
-                >
-                  {todo.title}
-                </span>
-              ) : (
-                <input
-                  type="text"
-                  onBlur={event => props.updateTodo(event, todo.id)}
-                  onKeyDown={event => {
-                    if (event.key === 'Enter') {
-                      props.updateTodo(event, todo.id);
-                    } else if (event.key === 'Escape') {
-                      props.cancelEdit(event, todo.id);
-                    }
-                  }}
-                  className="todo-item-input"
-                  defaultValue={todo.title}
-                  autoFocus
-                />
-              )}
+              {!todo.isEditing
+                ? renderTodoNotEditing(todo)
+                : renderTodoEditing(todo)}
             </div>
-            <button
-              onClick={() => props.deleteTodo(todo.id)}
-              className="x-button"
-            >
+            <button onClick={() => deleteTodo(todo.id)} className="x-button">
               <svg
                 className="x-button-icon"
                 fill="none"
@@ -75,12 +99,12 @@ function TodoList(props) {
 
       <div className="check-all-container">
         <div>
-          <button onClick={props.completeAllTodos} className="button">
+          <button onClick={completeAllTodos} className="button">
             Check All
           </button>
         </div>
 
-        <span>{props.remaining()} items remaining</span>
+        <span>{remaining()} items remaining</span>
       </div>
     </>
   );
